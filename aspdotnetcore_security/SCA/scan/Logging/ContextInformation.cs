@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WiredBrain.Logging
+namespace Logging
 {
     public class ContextInformation
     {

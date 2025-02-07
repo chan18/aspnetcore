@@ -27,7 +27,7 @@ namespace Logging
             loggerConfig
                 .ReadFrom.Configuration(config) // minimum levels defined per project in json files 
                 .Enrich.FromLogContext()
-                .Enrich.WithMachineName()
+                .Enrich.withMachineName()
                 .Enrich.WithProperty("Assembly", assemblyName)
                 .Enrich.WithAspnetcoreHttpcontext(provider, GetContextInfo)
                 .WriteTo.File(rollingFileName)
