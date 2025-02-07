@@ -1,0 +1,28 @@
+<html> 
+
+<head> 
+    <title>CORS Local Test</title>
+    <a href="#" onclick="loadProducts()" class="btn btn-primary">Load Products</a>
+
+    <!-- without config -->
+<!-- 
+    Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:5066/weatherforecast. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
+
+Uncaught (in promise) TypeError: NetworkError when attempting to fetch resource.  -->
+
+
+</head>
+
+<body>
+
+    <script>
+        async function loadProducts() {
+            const response = await fetch('http://localhost:5066/weatherforecast');
+            const myJson = await response.json();
+            console.log(myJson);
+        }
+    </script>
+
+</body>
+
+</html>
