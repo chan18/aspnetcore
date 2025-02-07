@@ -5,7 +5,6 @@ var builder = WebApplication.CreateBuilder(args);
 var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(",") ?? Array.Empty<string>();
 
 
-
 // add cors
 // Access-Control-Allow-Credentials : true
 // Access-Control-Allow-Origin: http:localhost:portnumber
@@ -13,10 +12,17 @@ var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(",") ?? Arra
 // builder.AllowAnyOrigin().AllowCredentials() -- not allowed security measure by cors.
 builder.Services.
         AddCors(options => {
-            options.AddPolicy("AllowAnyOrigin", builder => builder.WithOrigins(allowedOrigins).AllowCredentials());
+            options.AddPolicy("AllowAnyOrigin", 
+                                builder => {
+                                    builder.WithOrigins(allowedOrigins).AllowCredentials();
+                                    builder.WithOrigins("https://*.domainname.com");
+                                    builder.SetIsOriginAllowedToAllowWildcardSubdomains();
+                             });
             options.AddPolicy("PublicApi", builder => builder.AllowAnyOrigin().WithMethods("Get").WithHeaders("content-type"));
         });
 
+// builder.WithOrigins(allowedOrigins).SetPreFlightMaxAge(TimeSpan.FormMinutes(1)); // with cache time
+// builder.WithExposedHeaders("PageNo", "PageSize", "PageCount", "PageTotalRecords"); // to make the headers available.
 
 builder.Services.
         AddCors(options => options.AddPolicy("TestSetup", 
@@ -50,7 +56,7 @@ var summaries = new[]
 };
 
 // [EnableCors("PublicApi")]
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/weatherforecast", (HttpContext context) =>
 {
     var forecast =  Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
@@ -60,6 +66,13 @@ app.MapGet("/weatherforecast", () =>
             summaries[Random.Shared.Next(summaries.Length)]
         ))
         .ToArray();
+
+    // exposing custom headers.
+    // HttpContext.Response.Headers.Add(PageNo, pageNo.ToString());
+    // HttpContext.Response.Headers.Add(PageSize, pageSize.ToString());
+    // HttpContext.Response.Headers.Add(PageCount, pageCount.ToString());
+    // HttpContext.Response.Headers.Add(PageTotalRecords, totalRecords.ToString());
+
     return forecast;
 })
 .WithName("GetWeatherForecast");
@@ -70,3 +83,4 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
+
